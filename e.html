@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+           
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .countdown-container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #ff5722; /* Màu cam đặc trưng của bóng rổ */
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .timer {
+            font-size: 4em;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button.left {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        button.right {
+            background-color: #ff5722;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .score {
+            font-size: 3em;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .team-names {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1em;
+            margin: 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .upload-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            margin: 0 10px;
+        }
+
+        .reset-button {
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .reset-button:hover {
+            background-color: #45a049;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            font-size: 30px;
+        }
+
+        .team-indicator {
+            width: 100px;
+            height: 10px;
+            background-color: red;
+            margin: auto;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="countdown-container">
+        <h1>Countdown Timer</h1>
+        <p class="timer" id="countdown">10:00</p>
+        <p class="timer" id="extraTimer">12</p>
+        <div class="scoreboard">
+            <div>
+                <input type="text" id="guestName" value="Home">
+                <p id="homeScore">0</p>
+                <div id="leftIndicator" class="team-indicator"></div>
+            </div>
+            <div>
+                <input type="text" id="homeName" value="Guest">
+                <p id="guestScore">0</p>
+                <div id="rightIndicator" class="team-indicator"></div>
+            </div>
+        </div>
+        <label for="sound10min">Upload Sound for 10-minute Countdown:</label>
+        <input type="file" id="sound10min" accept="audio/*">
+        <label for="sound12sec">Upload Sound for 12-second Countdown:</label>
+        <input type="file" id="sound12sec" accept="audio/*">
+        <button class="reset-button" id="resetButton" onclick="resetTimers()">Reset</button>
+    </div>
+    <script>
+        // ... (JavaScript code của bạn vẫn giữ nguyên)
+        let countdownInterval, extraTimerInterval;
+        let remainingSeconds = 600;
+        let remainingExtraSeconds = 12;
+        let countdownRunning = false;
+        let extraTimerRunning = false;
+
+        function toggleCountdown() {
+            if (countdownRunning || extraTimerRunning) {
+                clearInterval(countdownInterval);
+                clearInterval(extraTimerInterval);
+                countdownRunning = false;
+                extraTimerRunning = false;
+            } else {
+                startCountdown();
+                start12SecTimer();
+            }
+        }
+
+        function startCountdown() {
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                if (remainingSeconds > 0) {
+                    remainingSeconds--;
+                    updateCountdownDisplay();
+                } else {
+                    clearInterval(countdownInterval);
+                    playSound("sound10min");
+                }
+            }, 1000);
+            countdownRunning = true;
+        }
+
+        function updateCountdownDisplay() {
+            let minutes = Math.floor(remainingSeconds / 60);
+            let seconds = remainingSeconds % 60;
+            document.getElementById('countdown').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function start12SecTimer() {
+            clearInterval(extraTimerInterval);
+            remainingExtraSeconds = 12;
+            document.getElementById('extraTimer').textContent = remainingExtraSeconds;
+            extraTimerInterval = setInterval(() => {
+                if (remainingExtraSeconds > 0) {
+                    remainingExtraSeconds--;
+                    document.getElementById('extraTimer').textContent = remainingExtraSeconds;
+                } else {
+                    clearInterval(extraTimerInterval);
+                    playSound("sound12sec");
+                    extraTimerRunning = false;
+                }
+            }, 1000);
+            extraTimerRunning = true;
+        }
+
+        function increaseScore(team) {
+            let scoreElement = document.getElementById(`${team}Score`);
+            scoreElement.textContent = parseInt(scoreElement.textContent) + 1;
+            start12SecTimer();
+            updateIndicator(team);
+        }
+
+        function playSound(inputId) {
+            let fileInput = document.getElementById(inputId);
+            if (fileInput.files.length > 0) {
+                let audio = new Audio(URL.createObjectURL(fileInput.files[0]));
+                audio.play();
+            }
+        }
+
+        function updateIndicator(team) {
+            document.getElementById('leftIndicator').style.display = (team === 'home') ? 'block' : 'none';
+            document.getElementById('rightIndicator').style.display = (team === 'guest') ? 'block' : 'none';
+        }
+
+        function resetTimers() {
+            clearInterval(countdownInterval);
+            clearInterval(extraTimerInterval);
+            remainingSeconds = 600;
+            remainingExtraSeconds = 12;
+            countdownRunning = false;
+            extraTimerRunning = false;
+            updateCountdownDisplay();
+            document.getElementById('extraTimer').textContent = "12";
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.code === "ArrowLeft") {
+                updateIndicator("home");
+                start12SecTimer();
+            } else if (event.code === "ArrowRight") {
+                updateIndicator("guest");
+                start12SecTimer();
+            } else if (event.code === "Space") {
+                toggleCountdown();
+            } else if (event.code === "Digit1") {
+                increaseScore("home");
+            } else if (event.code === "Digit2") {
+                increaseScore("guest");
+            }
+            else if (event.code === "Enter") {
+                resetTimers();}
+        });
+    </script>
+</body>
+</html>
