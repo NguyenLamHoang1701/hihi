@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Countdown Timer</title>
+    
+
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -12,19 +14,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 100%;
            
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
         }
-
+        
         .countdown-container {
             background-color: rgba(255, 255, 255, 0.8);
             padding: 40px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             text-align: center;
+            height: 100%;
+            width: 100%;
         }
 
         h1 {
@@ -99,7 +103,19 @@
         input[type="file"] {
             margin: 0 10px;
         }
-
+        .hihi{
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            position: absolute;
+            right: 6%;
+            top:79.5%;
+        }
         .reset-button {
             background-color: #4caf50;
             color: white;
@@ -132,6 +148,9 @@
     </style>
 </head>
 <body>
+    
+    
+    <button id="hihi" class="hihi" type="submit" onclick="window.location.href='h.html'">Lịch sử trận đấu</button>
     <div class="countdown-container">
         <h1>Countdown Timer</h1>
         <p class="timer" id="countdown">10:00</p>
@@ -148,20 +167,19 @@
                 <div id="rightIndicator" class="team-indicator"></div>
             </div>
         </div>
-        <label for="sound10min">Upload Sound for 10-minute Countdown:</label>
+        <label for="sound10min">10-minute:</label>
         <input type="file" id="sound10min" accept="audio/*">
-        <label for="sound12sec">Upload Sound for 12-second Countdown:</label>
+        <label for="sound12sec"> 12-second:</label>
         <input type="file" id="sound12sec" accept="audio/*">
         <button class="reset-button" id="resetButton" onclick="resetTimers()">Reset</button>
     </div>
     <script>
-        // ... (JavaScript code của bạn vẫn giữ nguyên)
         let countdownInterval, extraTimerInterval;
         let remainingSeconds = 600;
         let remainingExtraSeconds = 12;
         let countdownRunning = false;
         let extraTimerRunning = false;
-
+    
         function toggleCountdown() {
             if (countdownRunning || extraTimerRunning) {
                 clearInterval(countdownInterval);
@@ -173,7 +191,7 @@
                 start12SecTimer();
             }
         }
-
+    
         function startCountdown() {
             clearInterval(countdownInterval);
             countdownInterval = setInterval(() => {
@@ -187,14 +205,14 @@
             }, 1000);
             countdownRunning = true;
         }
-
+    
         function updateCountdownDisplay() {
             let minutes = Math.floor(remainingSeconds / 60);
             let seconds = remainingSeconds % 60;
             document.getElementById('countdown').textContent = 
                 `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
-
+    
         function start12SecTimer() {
             clearInterval(extraTimerInterval);
             remainingExtraSeconds = 12;
@@ -211,14 +229,14 @@
             }, 1000);
             extraTimerRunning = true;
         }
-
+    
         function increaseScore(team) {
             let scoreElement = document.getElementById(`${team}Score`);
             scoreElement.textContent = parseInt(scoreElement.textContent) + 1;
             start12SecTimer();
             updateIndicator(team);
         }
-
+    
         function playSound(inputId) {
             let fileInput = document.getElementById(inputId);
             if (fileInput.files.length > 0) {
@@ -226,23 +244,37 @@
                 audio.play();
             }
         }
-
+    
         function updateIndicator(team) {
             document.getElementById('leftIndicator').style.display = (team === 'home') ? 'block' : 'none';
             document.getElementById('rightIndicator').style.display = (team === 'guest') ? 'block' : 'none';
         }
-
+    
         function resetTimers() {
-            clearInterval(countdownInterval);
-            clearInterval(extraTimerInterval);
-            remainingSeconds = 600;
-            remainingExtraSeconds = 12;
-            countdownRunning = false;
-            extraTimerRunning = false;
-            updateCountdownDisplay();
-            document.getElementById('extraTimer').textContent = "12";
-        }
+    clearInterval(countdownInterval);
+    clearInterval(extraTimerInterval);
+    remainingSeconds = 600;
+    remainingExtraSeconds = 12;
+    countdownRunning = false;
+    extraTimerRunning = false;
+    updateCountdownDisplay();
+    document.getElementById('extraTimer').textContent = "12";
+    document.getElementById('homeScore').textContent = "0";
+    document.getElementById('guestScore').textContent = "0";
+    document.getElementById('leftIndicator').style.display = 'none';
+    document.getElementById('rightIndicator').style.display = 'none';
+}
 
+    
+        // Chỉ cho phép chọn một file duy nhất
+        document.getElementById("sound10min").addEventListener("change", function () {
+            this.files.length > 1 && (this.value = "");
+        });
+    
+        document.getElementById("sound12sec").addEventListener("change", function () {
+            this.files.length > 1 && (this.value = "");
+        });
+    
         document.addEventListener("keydown", (event) => {
             if (event.code === "ArrowLeft") {
                 updateIndicator("home");
@@ -256,10 +288,93 @@
                 increaseScore("home");
             } else if (event.code === "Digit2") {
                 increaseScore("guest");
+            } else if (event.code === "Enter") {
+                resetTimers();
             }
-            else if (event.code === "Enter") {
-                resetTimers();}
         });
+    // Lưu lịch sử trận đấu
+
+// Chuyển highlight sang đội còn lại
+function increaseScore(team) {
+    let scoreElement = document.getElementById(`${team}Score`);
+    scoreElement.textContent = parseInt(scoreElement.textContent) + 1;
+    start12SecTimer();
+
+    // Chuyển highlight sang đội còn lại
+    if (team === "home") {
+        updateIndicator("guest");
+    } else {
+        updateIndicator("home");
+    }
+
+    saveMatchHistory(); // Lưu lịch sử sau mỗi lần ghi điểm
+}
+
+// Reset nhưng giữ lịch sử
+function resetTimers() {
+    clearInterval(countdownInterval);
+    clearInterval(extraTimerInterval);
+    remainingSeconds = 600;
+    remainingExtraSeconds = 12;
+    countdownRunning = false;
+    extraTimerRunning = false;
+    updateCountdownDisplay();
+    document.getElementById('extraTimer').textContent = "12";
+    document.getElementById('homeScore').textContent = "0";
+    document.getElementById('guestScore').textContent = "0";
+    document.getElementById('leftIndicator').style.display = 'none';
+    document.getElementById('rightIndicator').style.display = 'none';
+    
+    saveMatchHistory(); // Lưu trạng thái trận đấu khi reset
+}
+function saveMatchHistory() {
+    const historyEntry = {
+        time: new Date().toLocaleString(),
+        home: document.getElementById('homeScore').textContent,
+        guest: document.getElementById('guestScore').textContent
+    };
+    let matchHistory = JSON.parse(localStorage.getItem("matchHistory")) || [];
+    matchHistory.push(historyEntry);
+    localStorage.setItem("matchHistory", JSON.stringify(matchHistory));
+}
+function checkEndGame() {
+    let homeScore = parseInt(document.getElementById('homeScore').textContent);
+    let guestScore = parseInt(document.getElementById('guestScore').textContent);
+
+    if (remainingSeconds === 0 || homeScore >= 21 || guestScore >= 21) {
+        clearInterval(countdownInterval);
+        clearInterval(extraTimerInterval);
+        countdownRunning = false;
+        extraTimerRunning = false;
+        
+        saveMatchHistory();
+        alert("Trận đấu kết thúc! Kết quả đã được lưu.");
+    }
+}
+
+function saveMatchHistory() {
+    let historyEntry = {
+        time: new Date().toLocaleString(),
+        homeName: document.getElementById('guestName').value,
+        guestName: document.getElementById('homeName').value,
+        homeScore: document.getElementById('homeScore').textContent,
+        guestScore: document.getElementById('guestScore').textContent
+    };
+
+    let matchHistory = JSON.parse(localStorage.getItem("matchHistory")) || [];
+    matchHistory.push(historyEntry);
+    localStorage.setItem("matchHistory", JSON.stringify(matchHistory));
+}
+
+function increaseScore(team) {
+    let scoreElement = document.getElementById(`${team}Score`);
+    scoreElement.textContent = parseInt(scoreElement.textContent) + 1;
+    start12SecTimer();
+    updateIndicator(team);
+    checkEndGame(); // Kiểm tra sau mỗi lần ghi điểm
+}
+
     </script>
+    
 </body>
 </html>

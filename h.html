@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch Sử Trận Đấu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        th {
+            background-color: #ff5722;
+            color: white;
+        }
+        .button {
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .back-button {
+            background-color: #4caf50;
+            color: white;
+        }
+        .clear-button {
+            background-color: #d32f2f;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lịch Sử Trận Đấu</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Thời Gian</th>
+                    <th>Đội Nhà</th>
+                    <th>Đội Khách</th>
+                    <th>Điểm Đội Nhà</th>
+                    <th>Điểm Đội Khách</th>
+                </tr>
+            </thead>
+            <tbody id="historyTable"></tbody>
+        </table>
+        <button class="button back-button" onclick="window.location.href='e.html'">Quay Lại</button>
+        <button class="button clear-button" onclick="clearHistory()">Xóa Lịch Sử</button>
+    </div>
+
+    <script>
+        function loadHistory() {
+            let matchHistory = JSON.parse(localStorage.getItem("matchHistory")) || [];
+            let tableBody = document.getElementById("historyTable");
+            tableBody.innerHTML = "";
+            
+            matchHistory.forEach(entry => {
+                let row = `<tr>
+                    <td>${entry.time}</td>
+                    <td>${entry.homeName}</td>
+                    <td>${entry.guestName}</td>
+                    <td>${entry.homeScore}</td>
+                    <td>${entry.guestScore}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function clearHistory() {
+            if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử?")) {
+                localStorage.removeItem("matchHistory");
+                loadHistory();
+            }
+        }
+
+        window.onload = loadHistory;
+    </script>
+</body>
+</html>
