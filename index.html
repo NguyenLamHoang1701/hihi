@@ -172,6 +172,11 @@
         <label for="sound12sec"> 12-second:</label>
         <input type="file" id="sound12sec" accept="audio/*">
         <button class="reset-button" id="resetButton" onclick="resetTimers()">Reset</button>
+        <div class="button-container">
+            <input type="number" id="adjustSeconds" placeholder="Seconds">
+            <button onclick="increaseCountdown()">Increase Time</button>
+            <button onclick="decreaseCountdown()">Decrease Time</button>
+        </div>
     </div>
     <script>
         let countdownInterval, extraTimerInterval;
@@ -214,6 +219,9 @@
         }
     
         function start12SecTimer() {
+            if (!countdownRunning) {
+                return; // Do not start the 12-second timer if the 10-minute countdown is not running
+            }
             clearInterval(extraTimerInterval);
             remainingExtraSeconds = 12;
             document.getElementById('extraTimer').textContent = remainingExtraSeconds;
@@ -235,6 +243,15 @@
             scoreElement.textContent = parseInt(scoreElement.textContent) + 1;
             start12SecTimer();
             updateIndicator(team);
+            checkEndGame(); // Kiểm tra sau mỗi lần ghi điểm
+        }
+    
+        function decreaseScore(team) {
+            let scoreElement = document.getElementById(`${team}Score`);
+            scoreElement.textContent = parseInt(scoreElement.textContent) - 1;
+            start12SecTimer();
+            updateIndicator(team);
+            checkEndGame(); // Kiểm tra sau mỗi lần ghi điểm
         }
     
         function playSound(inputId) {
@@ -251,129 +268,85 @@
         }
     
         function resetTimers() {
-    clearInterval(countdownInterval);
-    clearInterval(extraTimerInterval);
-    remainingSeconds = 600;
-    remainingExtraSeconds = 12;
-    countdownRunning = false;
-    extraTimerRunning = false;
-    updateCountdownDisplay();
-    document.getElementById('extraTimer').textContent = "12";
-    document.getElementById('homeScore').textContent = "0";
-    document.getElementById('guestScore').textContent = "0";
-    document.getElementById('leftIndicator').style.display = 'none';
-    document.getElementById('rightIndicator').style.display = 'none';
-}
-
+            clearInterval(countdownInterval);
+            clearInterval(extraTimerInterval);
+            remainingSeconds = 600;
+            remainingExtraSeconds = 12;
+            countdownRunning = false;
+            extraTimerRunning = false;
+            updateCountdownDisplay();
+            document.getElementById('extraTimer').textContent = "12";
+            document.getElementById('homeScore').textContent = "0";
+            document.getElementById('guestScore').textContent = "0";
+            document.getElementById('leftIndicator').style.display = 'none';
+            document.getElementById('rightIndicator').style.display = 'none';
+            saveMatchHistory(); // Lưu trạng thái trận đấu khi reset
+        }
     
-        // Chỉ cho phép chọn một file duy nhất
-        document.getElementById("sound10min").addEventListener("change", function () {
-            this.files.length > 1 && (this.value = "");
-        });
+        function saveMatchHistory() {
+            let historyEntry = {
+                time: new Date().toLocaleString(),
+                homeName: document.getElementById('guestName').value,
+                guestName: document.getElementById('homeName').value,
+                homeScore: document.getElementById('homeScore').textContent,
+                guestScore: document.getElementById('guestScore').textContent
+            };
     
-        document.getElementById("sound12sec").addEventListener("change", function () {
-            this.files.length > 1 && (this.value = "");
-        });
+            let matchHistory = JSON.parse(localStorage.getItem("matchHistory")) || [];
+            matchHistory.push(historyEntry);
+            localStorage.setItem("matchHistory", JSON.stringify(matchHistory));
+        }
+    
+        function checkEndGame() {
+            let homeScore = parseInt(document.getElementById('homeScore').textContent);
+            let guestScore = parseInt(document.getElementById('guestScore').textContent);
+    
+            if (remainingSeconds === 0 || homeScore >= 21 || guestScore >= 21) {
+                clearInterval(countdownInterval);
+                clearInterval(extraTimerInterval);
+                countdownRunning = false;
+                extraTimerRunning = false;
+                
+                saveMatchHistory();
+                alert("Trận đấu kết thúc! Kết quả đã được lưu.");
+            }
+        }
+    
+        function increaseCountdown() {
+            let adjustSeconds = parseInt(document.getElementById('adjustSeconds').value);
+            if (!isNaN(adjustSeconds) && adjustSeconds > 0) {
+                remainingSeconds += adjustSeconds;
+                updateCountdownDisplay();
+            }
+        }
+    
+        function decreaseCountdown() {
+            let adjustSeconds = parseInt(document.getElementById('adjustSeconds').value);
+            if (!isNaN(adjustSeconds) && adjustSeconds > 0) {
+                remainingSeconds -= adjustSeconds;
+                updateCountdownDisplay();
+            }
+        }
     
         document.addEventListener("keydown", (event) => {
             if (event.code === "ArrowLeft") {
-                updateIndicator("home");
                 start12SecTimer();
             } else if (event.code === "ArrowRight") {
-                updateIndicator("guest");
                 start12SecTimer();
-            } else if (event.code === "Space") {
+            } else if (event.code === "Enter") {
                 toggleCountdown();
             } else if (event.code === "Digit1") {
                 increaseScore("home");
             } else if (event.code === "Digit2") {
                 increaseScore("guest");
-            } else if (event.code === "Enter") {
+            } else if (event.code === "Space") {
                 resetTimers();
+            } else if (event.code === "Digit4") {
+                decreaseScore("guest");
+            } else if (event.code === "Digit3") {
+                decreaseScore("home");
             }
         });
-    // Lưu lịch sử trận đấu
-
-// Chuyển highlight sang đội còn lại
-function increaseScore(team) {
-    let scoreElement = document.getElementById(`${team}Score`);
-    scoreElement.textContent = parseInt(scoreElement.textContent) + 1;
-    start12SecTimer();
-
-    // Chuyển highlight sang đội còn lại
-    if (team === "home") {
-        updateIndicator("guest");
-    } else {
-        updateIndicator("home");
-    }
-
-    saveMatchHistory(); // Lưu lịch sử sau mỗi lần ghi điểm
-}
-
-// Reset nhưng giữ lịch sử
-function resetTimers() {
-    clearInterval(countdownInterval);
-    clearInterval(extraTimerInterval);
-    remainingSeconds = 600;
-    remainingExtraSeconds = 12;
-    countdownRunning = false;
-    extraTimerRunning = false;
-    updateCountdownDisplay();
-    document.getElementById('extraTimer').textContent = "12";
-    document.getElementById('homeScore').textContent = "0";
-    document.getElementById('guestScore').textContent = "0";
-    document.getElementById('leftIndicator').style.display = 'none';
-    document.getElementById('rightIndicator').style.display = 'none';
-    
-    saveMatchHistory(); // Lưu trạng thái trận đấu khi reset
-}
-function saveMatchHistory() {
-    const historyEntry = {
-        time: new Date().toLocaleString(),
-        home: document.getElementById('homeScore').textContent,
-        guest: document.getElementById('guestScore').textContent
-    };
-    let matchHistory = JSON.parse(localStorage.getItem("matchHistory")) || [];
-    matchHistory.push(historyEntry);
-    localStorage.setItem("matchHistory", JSON.stringify(matchHistory));
-}
-function checkEndGame() {
-    let homeScore = parseInt(document.getElementById('homeScore').textContent);
-    let guestScore = parseInt(document.getElementById('guestScore').textContent);
-
-    if (remainingSeconds === 0 || homeScore >= 21 || guestScore >= 21) {
-        clearInterval(countdownInterval);
-        clearInterval(extraTimerInterval);
-        countdownRunning = false;
-        extraTimerRunning = false;
-        
-        saveMatchHistory();
-        alert("Trận đấu kết thúc! Kết quả đã được lưu.");
-    }
-}
-
-function saveMatchHistory() {
-    let historyEntry = {
-        time: new Date().toLocaleString(),
-        homeName: document.getElementById('guestName').value,
-        guestName: document.getElementById('homeName').value,
-        homeScore: document.getElementById('homeScore').textContent,
-        guestScore: document.getElementById('guestScore').textContent
-    };
-
-    let matchHistory = JSON.parse(localStorage.getItem("matchHistory")) || [];
-    matchHistory.push(historyEntry);
-    localStorage.setItem("matchHistory", JSON.stringify(matchHistory));
-}
-
-function increaseScore(team) {
-    let scoreElement = document.getElementById(`${team}Score`);
-    scoreElement.textContent = parseInt(scoreElement.textContent) + 1;
-    start12SecTimer();
-    updateIndicator(team);
-    checkEndGame(); // Kiểm tra sau mỗi lần ghi điểm
-}
-
     </script>
     
 </body>
