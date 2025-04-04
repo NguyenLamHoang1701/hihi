@@ -252,18 +252,7 @@
             <p class="timer" id="countdown">10:00</p>
             <p class="timer" id="extraTimer">12</p>
             <div class="scoreboard">
-                <div>
-                    <input type="text" id="guestName" value="Home">
-                    <p id="homeScore">0</p>
-                    <button class="score-button" onclick="increaseScore('home')">+ Điểm Đội 1</button>
-                    <div id="leftIndicator" class="team-indicator"></div>
-                </div>
-                <div>
-                    <input type="text" id="homeName" value="Guest">
-                    <p id="guestScore">0</p>
-                    <button class="score-button" onclick="increaseScore('guest')">+ Điểm Đội 2</button>
-                    <div id="rightIndicator" class="team-indicator"></div>
-                </div>
+                
             </div>
         </div>
 
@@ -279,16 +268,13 @@
             <!-- Group 2: Start/Stop and Reset 12 Seconds -->
             <div class="button-group">
                 <button onclick="toggleCountdown()">Bắt đầu / Dừng</button>
+                <button onclick="stop12SecTimer()">Dừng 12 giây</button> <!-- New button -->
                 <button onclick="reset12SecTimer()">Reset 12 giây</button>
+                
             </div>
 
             <!-- Group 3: Increase and Decrease Scores -->
-            <div class="button-group">
 
-                <button class="score-button decrease-button" onclick="decreaseScore('home')">- Điểm Đội 1</button>
- 
-                <button class="score-button decrease-button" onclick="decreaseScore('guest')">- Điểm Đội 2</button>
-            </div>
 
             <!-- Group 4: Reset All and Match History -->
             <div class="button-group">
@@ -361,28 +347,20 @@
                     document.getElementById('extraTimer').textContent = remainingExtraSeconds;
                 } else {
                     clearInterval(extraTimerInterval);
+                    clearInterval(countdownInterval); // Stop the 10-minute timer
+                    countdownRunning = false; // Update the state
+                    extraTimerRunning = false; // Update the state
                     playSound("sound12sec"); // Play the 12-second timer sound
-                    extraTimerRunning = false;
+                    console.log("Both timers stopped after 12 seconds.");
                 }
             }, 1000);
             extraTimerRunning = true;
         }
     
-        function increaseScore(team) {
-            let scoreElement = document.getElementById(`${team}Score`);
-            scoreElement.textContent = parseInt(scoreElement.textContent) + 1;
-            start12SecTimer();
-            updateIndicator(team);
-            checkEndGame(); // Kiểm tra sau mỗi lần ghi điểm
-        }
+       
     
-        function decreaseScore(team) {
-            let scoreElement = document.getElementById(`${team}Score`);
-            scoreElement.textContent = parseInt(scoreElement.textContent) - 1;
-            start12SecTimer();
-            updateIndicator(team);
-            checkEndGame(); // Kiểm tra sau mỗi lần ghi điểm
-        }
+        checkEndGame(); // Kiểm tra sau mỗi lần ghi điểm
+        
     
         function playSound(inputId) {
             let fileInput = document.getElementById(inputId);
@@ -430,19 +408,7 @@
             start12SecTimer();
         }
     
-        function saveMatchHistory() {
-            let historyEntry = {
-                time: new Date().toLocaleString(),
-                homeName: document.getElementById('guestName').value,
-                guestName: document.getElementById('homeName').value,
-                homeScore: document.getElementById('homeScore').textContent,
-                guestScore: document.getElementById('guestScore').textContent
-            };
-    
-            let matchHistory = JSON.parse(localStorage.getItem("matchHistory")) || [];
-            matchHistory.push(historyEntry);
-            localStorage.setItem("matchHistory", JSON.stringify(matchHistory));
-        }
+       
     
         function checkEndGame() {
             let homeScore = parseInt(document.getElementById('homeScore').textContent);
@@ -475,6 +441,11 @@
             }
         }
     
+        function stop12SecTimer() {
+            clearInterval(extraTimerInterval); // Stop the 12-second timer
+            extraTimerRunning = false; // Update the state
+            console.log("12-second timer stopped.");
+        }
         
     </script>
     
