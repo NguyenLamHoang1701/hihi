@@ -1,453 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown Timer</title>
-    <link href="https://fonts.cdnfonts.com/css/digital-7-mono" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #363232;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        .countdown-container {
-            background-color: rgba(64, 59, 59, 0.8);
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(22, 22, 22, 0.2);
-            width: 90%; /* Adjust width for better responsiveness */
-            max-width: 1200px; /* Limit the maximum width */
-            margin: auto;
-            display: flex; /* Use flexbox for layout */
-            justify-content: space-between; /* Space between left and right sections */
-            align-items: flex-start; /* Align items at the top */
-            gap: 20px; /* Space between the left and right sections */
-        }
-
-        .left-section {
-            flex: 2; /* Take up more space for the left section */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .right-section {
-            flex: 1; /* Take up less space for the right section */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px; /* Space between button groups */
-        }
-
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px; /* Space between buttons in the same group */
-        }
-
-        .button-group + .button-group {
-            margin-top: 40px; /* Reduce spacing between button groups */
-        }
-
-        .timer {
-            font-size: 18em; /* Keep the large font size for countdown */
-            color: #ee1313;
-            margin-top: 20px; /* Add spacing from the top */
-            margin-bottom: 10px; /* Adjust spacing below the timer */
-            font-family: 'Digital-7 Mono', sans-serif;
-        }
-
-        #extraTimer {
-            font-size: 12em; /* Smaller font size for the 12-second timer */
-            margin-top: -20px; /* Move it closer to the 10-minute timer */
-            color: #eddfdf; /* Slightly lighter color for distinction */
-        }
-
-        .button-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px; /* Space between buttons */
-            margin-top: 20px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 1em;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            background-color: #4caf50; /* Green color */
-            color: white;
-            text-transform: uppercase;
-        }
-
-        button:hover {
-            background-color: #45a049; /* Slightly darker green on hover */
-        }
-
-        .score {
-            font-size: 3em;
-            color: #bce81d;
-            margin-bottom: 30px;
-        }
-
-        .team-names {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        input[type="text"] {
-            padding: 10px;
-            font-size: 1em;
-            margin: 0 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .upload-section {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        input[type="file"] {
-            margin: 0 10px;
-        }
-
-        .hihi {
-            background-color: #4caf50;
-            color: white;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            position: absolute;
-            right: 6%;
-            top: 79.5%;
-        }
-
-        .reset-button {
-            background-color: #4caf50;
-            color: white;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .reset-button:hover {
-            background-color: #45a049;
-        }
-
-        .scoreboard {
-            display: flex;
-            justify-content: center;
-            gap: 20px; /* Space between teams */
-            font-size: 1.5em; /* Adjust font size for scoreboard */
-            margin-bottom: 20px;
-            color:#eee6e6;
-        }
-
-        .scoreboard div {   
-            text-align: center;
-        }
-
-        .scoreboard input[type="text"] {
-            font-size: 1em;
-            margin-bottom: 10px;
-            width: 80px; /* Adjust width of team name inputs */
-        }
-
-        .scoreboard p {
-            font-size: 2em; /* Adjust font size for scores */
-            margin: 5px 0;
-        }
-
-        .team-indicator {
-            width: 100px;
-            height: 10px;
-            background-color: red;
-            margin: auto;
-            display: none;
-        }
-
-        .bottom-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .score-button {
-            margin-top: 10px;
-            background-color: #2196f3; /* Blue color for score buttons */
-            color: white;
-            padding: 10px 20px;
-            font-size: 1em;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .score-button:hover {
-            background-color: #1976d2; /* Darker blue on hover */
-        }
-
-        .decrease-button {
-            background-color: #72d163; /* Red color for decrease buttons */
-        }
-
-        .decrease-button:hover {
-            background-color: #3d934a; /* Darker red on hover */
-        }
-
-        .audio-input {
-            margin-top: auto; /* Push the audio input to the bottom */
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .audio-input label {
-            font-size: 1em;
-            color: #fffefe;
-        }
-
-        .audio-input input[type="file"] {
-            cursor: pointer;
-            padding: 5px;
-            font-size: 1em;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trang Web 4 Nút</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind config để dùng dark mode
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
 </head>
-<body>
-    
-    
-    <div class="countdown-container">
-        <!-- Left Section -->
-        <div class="left-section">
-            <p class="timer" id="countdown">10:00</p>
-            <p class="timer" id="extraTimer">12</p>
-            <div class="scoreboard">
-                
-            </div>
-        </div>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen flex items-center justify-center px-4">
 
-        <!-- Right Section -->
-        <div class="right-section">
-            <!-- Group 1: Increase and Decrease -->
-            <div class="button-group">
-                <input type="number" id="adjustSeconds" placeholder="Seconds" min="1">
-                <button onclick="increaseCountdown()">Tăng giây</button>
-                <button onclick="decreaseCountdown()">Giảm giây</button>
-            </div>
+  <div class="w-full max-w-2xl text-center space-y-8">
+    <h1 class="text-4xl font-bold animate-fade-in-up">🌐 Website 4 Nút Xịn Xò</h1>
+    <p class="text-lg animate-fade-in-up delay-150">Chọn một trong các nút bên dưới để đến trang bạn muốn</p>
 
-            <!-- Group 2: Start/Stop and Reset 12 Seconds -->
-            <div class="button-group">
-                <button onclick="toggleCountdown()">Bắt đầu / Dừng</button>
-                <button onclick="stop12SecTimer()">Dừng 12 giây</button> <!-- New button -->
-                <button onclick="reset12SecTimer()">Reset 12 giây</button>
-                
-            </div>
-
-            <!-- Group 3: Increase and Decrease Scores -->
-
-
-            <!-- Group 4: Reset All and Match History -->
-            <div class="button-group">
-                <button class="reset-button" id="resetButton" onclick="resetTimers()">Reset</button>
-                <button id="hihi" class="history-button" type="submit" onclick="window.location.href='h.html'">Lịch sử trận đấu</button>
-            </div>
-
-            <!-- Audio Input Section -->
-            
-            <div class="audio-input">
-                <label for="sound12sec">Chọn âm thanh 12 giây:</label>
-                <input type="file" id="sound12sec" accept="audio/*">
-            </div>
-            <div class="audio-input">
-                <label for="sound10min">Chọn âm thanh 10 phút:</label>
-                <input type="file" id="sound10min" accept="audio/*">
-            </div>
-        </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-fade-in-up delay-300">
+      <a href="https://example.com" target="_blank"
+         class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold py-3 px-6 rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-2xl">
+        Link 1
+      </a>
+      <a href="https://example.com" target="_blank"
+         class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold py-3 px-6 rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-2xl">
+        Link 2
+      </a>
+      <a href="https://example.com" target="_blank"
+         class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold py-3 px-6 rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-2xl">
+        Link 3
+      </a>
+      <a href="https://example.com" target="_blank"
+         class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold py-3 px-6 rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-2xl">
+        Link 4
+      </a>
     </div>
-    <script>
-        let countdownInterval, extraTimerInterval;
-        let remainingSeconds = 600;
-        let remainingExtraSeconds = 12;
-        let countdownRunning = false;
-        let extraTimerRunning = false;
-    
-        function toggleCountdown() {
-            if (countdownRunning || extraTimerRunning) {
-                clearInterval(countdownInterval);
-                clearInterval(extraTimerInterval);
-                countdownRunning = false;
-                extraTimerRunning = false;
-            } else {
-                startCountdown();
-                start12SecTimer();
-            }
-        }
-    
-        function startCountdown() {
-            clearInterval(countdownInterval);
-            countdownInterval = setInterval(() => {
-                if (remainingSeconds > 0) {
-                    remainingSeconds--;
-                    updateCountdownDisplay();
-                } else {
-                    clearInterval(countdownInterval);
-                    playSound("sound10min"); // Play the 10-minute timer sound
-                }
-            }, 1000);
-            countdownRunning = true;
-        }
-    
-        function updateCountdownDisplay() {
-            let minutes = Math.floor(remainingSeconds / 60);
-            let seconds = remainingSeconds % 60;
-            document.getElementById('countdown').textContent = 
-                `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-    
-        function start12SecTimer() {
-            if (!countdownRunning) {
-                return; // Do not start the 12-second timer if the 10-minute countdown is not running
-            }
-            clearInterval(extraTimerInterval);
-            remainingExtraSeconds = 12;
-            document.getElementById('extraTimer').textContent = remainingExtraSeconds;
-            extraTimerInterval = setInterval(() => {
-                if (remainingExtraSeconds > 0) {
-                    remainingExtraSeconds--;
-                    document.getElementById('extraTimer').textContent = remainingExtraSeconds;
-                } else {
-                    clearInterval(extraTimerInterval);
-                    clearInterval(countdownInterval); // Stop the 10-minute timer
-                    countdownRunning = false; // Update the state
-                    extraTimerRunning = false; // Update the state
-                    playSound("sound12sec"); // Play the 12-second timer sound
-                    console.log("Both timers stopped after 12 seconds.");
-                }
-            }, 1000);
-            extraTimerRunning = true;
-        }
-    
-       
-    
-        checkEndGame(); // Kiểm tra sau mỗi lần ghi điểm
-        
-    
-        function playSound(inputId) {
-            let fileInput = document.getElementById(inputId);
-            if (fileInput.files.length > 0) {
-                let audio = new Audio(URL.createObjectURL(fileInput.files[0]));
-                audio.play();
-        
-                // Stop the audio after 3 seconds
-                setTimeout(() => {
-                    audio.pause();
-                    audio.currentTime = 0; // Reset the audio to the beginning
-                }, 5000);
-            } else {
-                console.error("No audio file selected for", inputId);
-            }
-        }
-    
-        function updateIndicator(team) {
-            document.getElementById('leftIndicator').style.display = (team === 'home') ? 'block' : 'none';
-            document.getElementById('rightIndicator').style.display = (team === 'guest') ? 'block' : 'none';
-        }
-    
-        function resetTimers() {
-            clearInterval(countdownInterval);
-            clearInterval(extraTimerInterval);
-            remainingSeconds = 600;
-            remainingExtraSeconds = 12;
-            countdownRunning = false;
-            extraTimerRunning = false;
-            updateCountdownDisplay();
-            document.getElementById('extraTimer').textContent = "12";
-            document.getElementById('homeScore').textContent = "0";
-            document.getElementById('guestScore').textContent = "0";
-            document.getElementById('leftIndicator').style.display = 'none';
-            document.getElementById('rightIndicator').style.display = 'none';
-            saveMatchHistory(); 
-        }
-        function reset12SecTimer() {
-            clearInterval(extraTimerInterval);
-            remainingExtraSeconds = 12;
-            document.getElementById('extraTimer').textContent = remainingExtraSeconds;
-            extraTimerRunning = false;
-        
-            // Automatically restart the 12-second timer
-            start12SecTimer();
-        }
-    
-       
-    
-        function checkEndGame() {
-            let homeScore = parseInt(document.getElementById('homeScore').textContent);
-            let guestScore = parseInt(document.getElementById('guestScore').textContent);
-    
-            if (remainingSeconds === 0 || homeScore >= 21 || guestScore >= 21) {
-                clearInterval(countdownInterval);
-                clearInterval(extraTimerInterval);
-                countdownRunning = false;
-                extraTimerRunning = false;
-                
-                saveMatchHistory();
-                alert("Trận đấu kết thúc! Kết quả đã được lưu.");
-            }
-        }
-    
-        function increaseCountdown() {
-            let adjustSeconds = parseInt(document.getElementById('adjustSeconds').value);
-            if (!isNaN(adjustSeconds) && adjustSeconds > 0) {
-                remainingSeconds += adjustSeconds;
-                updateCountdownDisplay();
-            }
-        }
-    
-        function decreaseCountdown() {
-            let adjustSeconds = parseInt(document.getElementById('adjustSeconds').value);
-            if (!isNaN(adjustSeconds) && adjustSeconds > 0) {
-                remainingSeconds = Math.max(0, remainingSeconds - adjustSeconds); // Prevent negative values
-                updateCountdownDisplay();
-            }
-        }
-    
-        function stop12SecTimer() {
-            clearInterval(extraTimerInterval); // Stop the 12-second timer
-            extraTimerRunning = false; // Update the state
-            console.log("12-second timer stopped.");
-        }
-        
-    </script>
-    
+
+    <!-- Nút bật tắt dark mode thủ công -->
+    <button id="toggleDark" class="mt-6 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white py-2 px-4 rounded-full shadow-md hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+      🌗 Bật / Tắt Dark Mode
+    </button>
+  </div>
+
+  <!-- Custom animation -->
+  <style>
+    .animate-fade-in-up {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+    .delay-150 { animation-delay: 0.15s; }
+    .delay-300 { animation-delay: 0.3s; }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+
+  <!-- Toggle Dark Mode Script -->
+  <script>
+    const toggleBtn = document.getElementById("toggleDark");
+    toggleBtn.addEventListener("click", () => {
+      document.documentElement.classList.toggle("dark");
+    });
+  </script>
 </body>
 </html>
